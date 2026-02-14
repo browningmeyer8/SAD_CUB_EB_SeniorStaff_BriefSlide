@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Senior Staff / CMD</title>
+<title>Senior Staff Takeaways</title>
 <style>
-    /* A neutral background to make the white box stand out */
+    /* 1. New Background Color */
     body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         display: flex; 
@@ -13,35 +13,51 @@
         align-items: center; 
         height: 100vh; 
         margin: 0;
-        background-color: #444444; /* The grey background you requested */
+        background-color: #444444; 
     }
     
-    /* The main white box with a black border */
-    #content-box { 
-        width: 80%;
-        max-width: 900px; 
-        height: 85%;
-        background-color: white; 
-        box-shadow: 0 8px 30px rgba(0,0,0,0.2); 
+    /* This new wrapper controls the overall size, border, and shadow */
+    #component-wrapper {
+        width: 70%;
+        max-width: 800px;
+        height: 75%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        border: 3px solid #000000;
         border-radius: 8px;
-        padding: 30px;
-        box-sizing: border-box;
-        overflow-y: auto;
-        border: 3px solid #000000; /* The solid black border */
-        position: relative; /* For positioning the hover-edit icon */
     }
 
-    /* The content area where text from Firebase will go */
+    /* 2. The New Title Bar */
+    #title-bar {
+        background-color: #003b56;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-size: 1.5em;
+        font-weight: bold;
+        border-bottom: 3px solid #000000; /* Separator line */
+    }
+
+    /* 3. The White Content Box */
+    #content-box { 
+        flex-grow: 1; /* Makes it fill the remaining space */
+        background-color: white; 
+        padding: 25px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        position: relative;
+    }
+
     #takeaways-content {
-        font-size: 1.3em;
-        line-height: 1.5;
+        font-size: 1.2em;
+        line-height: 1.4;
     }
 
     #takeaways-content p, #takeaways-content li {
-        padding: 5px 0;
+        padding: 4px 0;
     }
 
-    /* The discreet edit icon that appears on hover */
     #edit-icon {
         position: absolute;
         top: 15px;
@@ -60,10 +76,17 @@
 </head>
 <body>
 
-<div id="content-box">
-    <div id="takeaways-content"></div>
-    <a id="edit-icon" href="edit-takeaways.html" title="Edit Takeaways">&#9881;</a>
+<!-- The new wrapper contains both the title and content -->
+<div id="component-wrapper">
+    <div id="title-bar">
+        Senior Staff / CMD
+    </div>
+    <div id="content-box">
+        <div id="takeaways-content"></div>
+        <a id="edit-icon" href="edit-takeaways.html" title="Edit Takeaways">&#9881;</a>
+    </div>
 </div>
+
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
