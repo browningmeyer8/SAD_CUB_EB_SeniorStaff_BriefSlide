@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Senior Staff Slide</title>
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+    /* All styles are identical to the agenda edit page */
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; }
+    h1 { color: #333; }
+    #edit-container { width: 80%; max-width: 900px; text-align: center; }
+    #editor-container { height: 400px; background-color: white; font-size: 1.2em; }
+    #button-container { margin-top: 20px; display: flex; justify-content: center; gap: 20px; }
+    .action-btn { padding: 15px 30px; font-size: 1.2em; border: none; border-radius: 8px; cursor: pointer; color: white; }
+    #save-btn { background-color: #28a745; }
+    #clear-btn { background-color: #dc3545; }
+</style>
+</head>
+<body>
+
+<h1>Edit Key Takeaways</h1>
+<div id="edit-container">
+    <div id="editor-container"></div>
+    <div id="button-container">
+        <button id="save-btn" class="action-btn">Save and Go Back</button>
+        <button id="clear-btn" class="action-btn">Clear Content</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<script>
+    // Using the same Firebase project
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJFEiLuC5J9N5c-pXgS1qvQri_ExpbuGE",
+      authDomain: "sad-cub-agenda.firebaseapp.com",
+      projectId: "sad-cub-agenda",
+      storageBucket: "sad-cub-agenda.appspot.com",
+      messagingSenderId: "38304426152",
+      appId: "1:38304426152:web:fdadf5458c85db25d23a9d",
+      measurementId: "G-HPNQ4WVG42"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const database = firebase.database();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const saveBtn = document.getElementById('save-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        // NEW: Reference the new location in the database
+        const takeawaysRef = database.ref('takeawaysContent');
+
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Load data from the new location
+        takeawaysRef.once('value', (snapshot) => {
+            const currentContent = snapshot.val();
+            if (currentContent) {
+                quill.root.innerHTML = currentContent;
+            }
+        });
+
+        // Save data to the new location
+        saveBtn.addEventListener('click', function() {
+            const newContent = quill.root.innerHTML;
+            if (newContent === '<p><br></p>') {
+                takeawaysRef.remove();
+                window.location.href = 'takeaways.html'; // Go back to the takeaways slide
+                return;
+            }
+            takeawaysRef.set(newContent)
+                .then(() => {
+                    window.location.href = 'takeaways.html'; // Go back to the takeaways slide
+                });
+        });
+
+        // Clear data from the new location
+        clearBtn.addEventListener('click', function() {
+            if (confirm("Are you sure you want to clear this content?")) {
+                takeawaysRef.remove().then(() => {
+                    quill.setText('');
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
