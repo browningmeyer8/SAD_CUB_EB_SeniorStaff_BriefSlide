@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Senior Staff Takeaways</title>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
-    /* 1. New Background Color */
     body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         display: flex; 
@@ -16,7 +16,6 @@
         background-color: #444444; 
     }
     
-    /* This new wrapper controls the overall size, border, and shadow */
     #component-wrapper {
         width: 70%;
         max-width: 800px;
@@ -26,9 +25,9 @@
         box-shadow: 0 8px 30px rgba(0,0,0,0.3);
         border: 3px solid #000000;
         border-radius: 8px;
+        overflow: hidden;
     }
 
-    /* 2. The New Title Bar */
     #title-bar {
         background-color: #003b56;
         color: white;
@@ -36,17 +35,17 @@
         padding: 10px;
         font-size: 1.5em;
         font-weight: bold;
-        border-bottom: 3px solid #000000; /* Separator line */
+        border-bottom: 3px solid #000000;
     }
 
-    /* 3. The White Content Box */
+    /* --- MODIFIED: The content box is now the positioning parent for the button --- */
     #content-box { 
-        flex-grow: 1; /* Makes it fill the remaining space */
+        flex-grow: 1;
         background-color: white; 
         padding: 25px;
         box-sizing: border-box;
         overflow-y: auto;
-        position: relative;
+        position: relative; /* This is crucial for positioning the button inside */
     }
 
     #takeaways-content {
@@ -58,32 +57,44 @@
         padding: 4px 0;
     }
 
-    #edit-icon {
-        position: absolute;
-        top: 15px;
+    /* --- MODIFIED: Positioned absolutely within the content box --- */
+    #edit-btn {
+        position: absolute; /* Position relative to the #content-box */
+        bottom: 15px;
         right: 15px;
-        font-size: 24px;
-        color: #aaa;
+        background-color: white;
+        color: black;
+        border: 2px solid #000000;
+        border-radius: 5px;
+        padding: 8px 12px; /* Slightly smaller padding */
+        font-size: 0.9em; /* Slightly smaller font */
+        font-weight: bold;
         text-decoration: none;
-        opacity: 0;
-        transition: opacity 0.2s ease-in-out;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: background-color 0.2s, color 0.2s;
     }
 
-    #content-box:hover #edit-icon {
-        opacity: 1;
+    #edit-btn:hover {
+        background-color: #f0f0f0;
+    }
+    /* --- END OF MODIFIED SECTION --- */
+
+    .ql-toolbar {
+        display: none !important;
     }
 </style>
 </head>
 <body>
 
-<!-- The new wrapper contains both the title and content -->
 <div id="component-wrapper">
     <div id="title-bar">
         Senior Staff / CMD
     </div>
     <div id="content-box">
-        <div id="takeaways-content"></div>
-        <a id="edit-icon" href="edit-takeaways.html" title="Edit Takeaways">&#9881;</a>
+        <div id="takeaways-content" class="ql-editor"></div>
+        <!-- MODIFIED: The button is now inside the content box -->
+        <a id="edit-btn" href="edit-takeaways.html" title="Edit Takeaways">Edit Page</a>
     </div>
 </div>
 
