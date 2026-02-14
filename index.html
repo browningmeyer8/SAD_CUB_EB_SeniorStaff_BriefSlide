@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Senior Staff / CMD</title>
+<title>Senior Staff Takeaways</title>
 <style>
+    /* A neutral background to make the white box stand out */
     body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         display: flex; 
@@ -12,28 +13,25 @@
         align-items: center; 
         height: 100vh; 
         margin: 0;
-        background-image: url('https://d1ldvf68ux039x.cloudfront.net/thumbs/photos/2212/7542749/500h_q95.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        background-color: #c4c4c4; /* The grey background you requested */
     }
     
-    /* --- MODIFIED: New styles for the dark, transparent box --- */
+    /* The main white box with a black border */
     #content-box { 
         width: 80%;
         max-width: 900px; 
         height: 85%;
-        background-color: rgba(25, 25, 25, 0.8); /* Dark semi-transparent background */
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3); 
+        background-color: white; 
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2); 
         border-radius: 8px;
         padding: 30px;
         box-sizing: border-box;
         overflow-y: auto;
-        color: white; /* Make all text inside white */
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Optional: subtle border */
+        border: 3px solid #000000; /* The solid black border */
+        position: relative; /* For positioning the hover-edit icon */
     }
-    /* --- END OF MODIFIED SECTION --- */
 
+    /* The content area where text from Firebase will go */
     #takeaways-content {
         font-size: 1.3em;
         line-height: 1.5;
@@ -43,37 +41,29 @@
         padding: 5px 0;
     }
 
-    /* --- MODIFIED: Floating edit button, similar to the old agenda design --- */
-    #edit-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 50%;
+    /* The discreet edit icon that appears on hover */
+    #edit-icon {
+        position: absolute;
+        top: 15px;
+        right: 15px;
         font-size: 24px;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        z-index: 100;
+        color: #aaa;
         text-decoration: none;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    #content-box:hover #edit-icon {
+        opacity: 1;
     }
 </style>
 </head>
 <body>
 
-<!-- The content box -->
 <div id="content-box">
     <div id="takeaways-content"></div>
+    <a id="edit-icon" href="edit-takeaways.html" title="Edit Takeaways">&#9881;</a>
 </div>
-
-<!-- The floating edit button, outside the content box -->
-<a id="edit-btn" href="edit-takeaways.html" title="Edit Takeaways">&#9881;</a>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
