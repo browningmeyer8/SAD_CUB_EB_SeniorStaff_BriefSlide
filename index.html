@@ -38,14 +38,13 @@
         border-bottom: 3px solid #000000;
     }
 
-    /* --- MODIFIED: The content box is now the positioning parent for the button --- */
     #content-box { 
         flex-grow: 1;
         background-color: white; 
         padding: 25px;
         box-sizing: border-box;
         overflow-y: auto;
-        position: relative; /* This is crucial for positioning the button inside */
+        /* No longer needs to be a positioning parent */
     }
 
     #takeaways-content {
@@ -57,21 +56,22 @@
         padding: 4px 0;
     }
 
-    /* --- MODIFIED: Positioned absolutely within the content box --- */
+    /* --- MODIFIED: The button is now fixed to the viewport again --- */
     #edit-btn {
-        position: absolute; /* Position relative to the #content-box */
-        bottom: 15px;
-        right: 15px;
+        position: fixed; /* Position relative to the browser window */
+        bottom: 20px;
+        right: 20px;
         background-color: white;
         color: black;
         border: 2px solid #000000;
         border-radius: 5px;
-        padding: 8px 12px; /* Slightly smaller padding */
-        font-size: 0.9em; /* Slightly smaller font */
+        padding: 10px 15px;
+        font-size: 1em;
         font-weight: bold;
         text-decoration: none;
         cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 100;
         transition: background-color 0.2s, color 0.2s;
     }
 
@@ -93,10 +93,11 @@
     </div>
     <div id="content-box">
         <div id="takeaways-content" class="ql-editor"></div>
-        <!-- MODIFIED: The button is now inside the content box -->
-        <a id="edit-btn" href="edit-takeaways.html" title="Edit Takeaways">Edit Page</a>
     </div>
 </div>
+
+<!-- MODIFIED: The button is now outside the component wrapper -->
+<a id="edit-btn" href="edit-takeaways.html" title="Edit Takeaways">Edit Page</a>
 
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
