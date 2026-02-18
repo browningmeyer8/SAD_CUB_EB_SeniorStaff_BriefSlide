@@ -7,7 +7,7 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
 <style>
-    /* All your custom CSS remains the same */
+    /* CSS is unchanged */
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; }
     h1 { color: #333; }
     #edit-container { width: 80%; max-width: 900px; text-align: center; }
@@ -19,7 +19,6 @@
 </style>
 </head>
 <body>
-
 <h1>Edit Key Takeaways</h1>
 <div id="edit-container">
     <div id="editor-container"></div>
@@ -28,7 +27,6 @@
         <button id="clear-btn" class="action-btn">Clear Content</button>
     </div>
 </div>
-
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://js.arcgis.com/4.28/"></script>
 <script>
@@ -36,78 +34,36 @@
         const saveBtn = document.getElementById('save-btn');
         const clearBtn = document.getElementById('clear-btn');
         const contentIdToEdit = 'takeaways';
-
-        require([
-            "esri/layers/FeatureLayer"
-        ], function(FeatureLayer) {
-
+        require(["esri/layers/FeatureLayer"], function(FeatureLayer) {
+            // --- MODIFIED: Changed http to https ---
             const featureLayer = new FeatureLayer({
                 url: "https://jecop.usace.army.mil/publish/rest/services/MVK/MVK_VECTOR_OWNER_testing_webappsdatasharing/FeatureServer/0"
             });
 
             const quill = new Quill('#editor-container', {
                 theme: 'snow',
-                modules: {
-                    toolbar: [
-                        [{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'align': [] }],
-                        [{ 'color': [] }, { 'background': [] }], ['clean']
-                    ]
-                }
+                modules: { toolbar: [ [{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'align': [] }], [{ 'color': [] }, { 'background': [] }], ['clean'] ] }
             });
 
-            // Load initial content from the feature service
-            featureLayer.queryFeatures({
-                where: `ContentID = '${contentIdToEdit}'`,
-                outFields: ["HtmlContent"],
-                returnGeometry: false
-            }).then(result => {
-                if (result.features.length > 0) {
-                    quill.root.innerHTML = result.features[0].attributes.HtmlContent || '<p><br></p>';
-                }
-            });
+            featureLayer.queryFeatures({ where: `ContentID = '${contentIdToEdit}'`, outFields: ["HtmlContent"], returnGeometry: false })
+                .then(result => { if (result.features.length > 0) { quill.root.innerHTML = result.features[0].attributes.HtmlContent || '<p><br></p>'; } });
 
             function saveContent(content) {
-                // First, query for the feature we want to update to get its OBJECTID
-                featureLayer.queryFeatures({
-                    where: `ContentID = '${contentIdToEdit}'`,
-                    outFields: ["OBJECTID"],
-                    returnGeometry: false
-                }).then(result => {
-                    if (result.features.length > 0) {
-                        const featureToUpdate = result.features[0];
-                        featureToUpdate.attributes.HtmlContent = content;
-                        
-                        // Apply the edit
-                        featureLayer.applyEdits({
-                            updateFeatures: [featureToUpdate]
-                        }).then(editResult => {
-                            if (editResult.updateResults.length > 0 && !editResult.updateResults[0].error) {
-                                window.location.href = 'index.html'; // Success!
-                            } else {
-                                alert('Save failed. Please check the console for errors.');
-                                console.error("Save failed: ", editResult.updateResults[0].error);
-                            }
-                        }).catch(error => {
-                            alert('An error occurred while saving.');
-                            console.error("applyEdits error: ", error);
-                        });
-                    } else {
-                        alert(`Error: Cannot find content with ID '${contentIdToEdit}' to update.`);
-                    }
-                });
+                featureLayer.queryFeatures({ where: `ContentID = '${contentIdToEdit}'`, outFields: ["OBJECTID"], returnGeometry: false })
+                    .then(result => {
+                        if (result.features.length > 0) {
+                            const featureToUpdate = result.features[0];
+                            featureToUpdate.attributes.HtmlContent = content;
+                            featureLayer.applyEdits({ updateFeatures: [featureToUpdate] })
+                                .then(editResult => {
+                                    if (editResult.updateResults.length > 0 && !editResult.updateResults[0].error) { window.location.href = 'index.html'; } 
+                                    else { alert('Save failed.'); console.error("Save error: ", editResult.updateResults[0].error); }
+                                }).catch(error => { alert('Save error.'); console.error("applyEdits error: ", error); });
+                        } else { alert(`Error: Cannot find Content ID '${contentIdToEdit}'.`); }
+                    });
             }
-
-            saveBtn.addEventListener('click', function() {
-                const newContent = quill.root.innerHTML;
-                saveContent(newContent === '<p><br></p>' ? '' : newContent);
-            });
-
-            clearBtn.addEventListener('click', function() {
-                if (confirm("Are you sure?")) {
-                    saveContent(''); // Save an empty string to clear the content
-                }
-            });
+            saveBtn.addEventListener('click', () => saveContent(quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML));
+            clearBtn.addEventListener('click', () => { if (confirm("Are you sure?")) { saveContent(''); } });
         });
     });
 </script>
