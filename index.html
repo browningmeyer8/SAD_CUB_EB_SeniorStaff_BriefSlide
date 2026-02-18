@@ -4,85 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Senior Staff Takeaways</title>
+<!-- NEW: ArcGIS API for JavaScript CSS -->
+<link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
-    body { 
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        display: flex; 
-        justify-content: center; 
-        align-items: center; 
-        height: 100vh; 
-        margin: 0;
-        background-color: #444444; 
-    }
-    
-    #component-wrapper {
-        width: 70%;
-        max-width: 800px;
-        height: 75%;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        border: 3px solid #000000;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    #title-bar {
-        background-color: #003b56;
-        color: white;
-        text-align: center;
-        padding: 10px;
-        font-size: 1.5em;
-        font-weight: bold;
-        border-bottom: 3px solid #000000;
-    }
-
-    #content-box { 
-        flex-grow: 1;
-        background-color: white; 
-        padding: 25px;
-        box-sizing: border-box;
-        overflow-y: auto;
-        /* No longer needs to be a positioning parent */
-    }
-
-    #takeaways-content {
-        font-size: 1.2em;
-        line-height: 1.4;
-    }
-
-    #takeaways-content p, #takeaways-content li {
-        padding: 4px 0;
-    }
-
-    /* --- MODIFIED: The button is now fixed to the viewport again --- */
-    #edit-btn {
-        position: fixed; /* Position relative to the browser window */
-        bottom: 20px;
-        right: 20px;
-        background-color: white;
-        color: black;
-        border: 2px solid #000000;
-        border-radius: 5px;
-        padding: 10px 15px;
-        font-size: 1em;
-        font-weight: bold;
-        text-decoration: none;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        z-index: 100;
-        transition: background-color 0.2s, color 0.2s;
-    }
-
-    #edit-btn:hover {
-        background-color: #f0f0f0;
-    }
-    /* --- END OF MODIFIED SECTION --- */
-
-    .ql-toolbar {
-        display: none !important;
-    }
+    /* All your custom CSS remains the same */
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #444444; }
+    #component-wrapper { width: 70%; max-width: 800px; height: 75%; display: flex; flex-direction: column; box-shadow: 0 8px 30px rgba(0,0,0,0.3); border: 3px solid #000000; border-radius: 8px; overflow: hidden; }
+    #title-bar { background-color: #003b56; color: white; text-align: center; padding: 10px; font-size: 1.5em; font-weight: bold; border-bottom: 3px solid #000000; }
+    #content-box { flex-grow: 1; background-color: white; padding: 25px; box-sizing: border-box; overflow-y: auto; position: relative; }
+    #takeaways-content { font-size: 1.2em; line-height: 1.4; }
+    #takeaways-content p, #takeaways-content li { padding: 4px 0; }
+    #edit-btn { position: fixed; bottom: 20px; right: 20px; background-color: white; color: black; border: 2px solid #000000; border-radius: 5px; padding: 10px 15px; font-size: 1em; font-weight: bold; text-decoration: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100; transition: background-color 0.2s, color 0.2s; }
+    #edit-btn:hover { background-color: #f0f0f0; }
+    .ql-toolbar { display: none !important; }
 </style>
 </head>
 <body>
@@ -96,41 +31,53 @@
     </div>
 </div>
 
-<!-- MODIFIED: The button is now outside the component wrapper -->
 <a id="edit-btn" href="edit-takeaways.html" title="Edit Takeaways">Edit Page</a>
 
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<!-- NEW: ArcGIS API for JavaScript -->
+<script src="https://js.arcgis.com/4.28/"></script>
 <script>
-    // --- Your "Senior Staff Slide" Firebase Config ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyBPPv_iOY2kt_Hvc0TluhMBUmGDwuK0GfA",
-      authDomain: "sad-cub-seniorstaffslide.firebaseapp.com",
-      databaseURL: "https://sad-cub-seniorstaffslide-default-rtdb.firebaseio.com",
-      projectId: "sad-cub-seniorstaffslide",
-      storageBucket: "sad-cub-seniorstaffslide.firebasestorage.app",
-      messagingSenderId: "815161185017",
-      appId: "1:815161185017:web:00d7243ec97188149b4828",
-      measurementId: "G-YMW79JFN91"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const database = firebase.database();
-
     document.addEventListener('DOMContentLoaded', function() {
         const takeawaysContentDiv = document.getElementById('takeaways-content');
-        const takeawaysRef = database.ref('takeawaysContent');
+        
+        // Define which content ID we are targeting on this page
+        const contentIdToLoad = 'takeaways';
 
-        takeawaysRef.on('value', (snapshot) => {
-            const takeawaysHtml = snapshot.val();
-            if (takeawaysHtml) {
-                takeawaysContentDiv.innerHTML = takeawaysHtml;
-            } else {
-                takeawaysContentDiv.innerHTML = '';
+        // Use the ArcGIS API
+        require([
+            "esri/layers/FeatureLayer",
+            "esri/tasks/QueryTask",
+            "esri/tasks/support/Query"
+        ], function(FeatureLayer, QueryTask, Query) {
+
+            // The URL to your Feature Service Layer (Layer 0)
+            const featureServiceUrl = "https://jecop.usace.army.mil/publish/rest/services/MVK/MVK_VECTOR_OWNER_testing_webappsdatasharing/FeatureServer/0";
+
+            function loadContent() {
+                const queryTask = new QueryTask({
+                    url: featureServiceUrl
+                });
+                const query = new Query({
+                    where: `ContentID = '${contentIdToLoad}'`, // SQL-like query to find the right row
+                    outFields: ["HtmlContent"], // We only need this field
+                    returnGeometry: false
+                });
+
+                queryTask.execute(query).then(function(result) {
+                    if (result.features.length > 0) {
+                        const content = result.features[0].attributes.HtmlContent;
+                        takeawaysContentDiv.innerHTML = content || '';
+                    } else {
+                        console.error(`ContentID '${contentIdToLoad}' not found in the feature service.`);
+                        takeawaysContentDiv.innerHTML = `<p>Error: Content not found.</p>`;
+                    }
+                }).catch(function(error){
+                    console.error("Query failed: ", error);
+                    takeawaysContentDiv.innerHTML = `<p>Error loading content.</p>`;
+                });
             }
+
+            // Load the content initially
+            loadContent();
         });
     });
 </script>
