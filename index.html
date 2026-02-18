@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Senior Staff Takeaways</title>
-<!-- NEW: ArcGIS API for JavaScript CSS -->
 <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
-    /* All your custom CSS remains the same */
+    /* CSS is unchanged */
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #444444; }
     #component-wrapper { width: 70%; max-width: 800px; height: 75%; display: flex; flex-direction: column; box-shadow: 0 8px 30px rgba(0,0,0,0.3); border: 3px solid #000000; border-radius: 8px; overflow: hidden; }
     #title-bar { background-color: #003b56; color: white; text-align: center; padding: 10px; font-size: 1.5em; font-weight: bold; border-bottom: 3px solid #000000; }
@@ -21,66 +20,39 @@
 </style>
 </head>
 <body>
-
 <div id="component-wrapper">
-    <div id="title-bar">
-        Senior Staff / CMD
-    </div>
+    <div id="title-bar"> Senior Staff / CMD </div>
     <div id="content-box">
         <div id="takeaways-content" class="ql-editor"></div>
     </div>
 </div>
-
 <a id="edit-btn" href="edit-takeaways.html" title="Edit Takeaways">Edit Page</a>
-
-<!-- NEW: ArcGIS API for JavaScript -->
 <script src="https://js.arcgis.com/4.28/"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const takeawaysContentDiv = document.getElementById('takeaways-content');
-        
-        // Define which content ID we are targeting on this page
         const contentIdToLoad = 'takeaways';
-
-        // Use the ArcGIS API
-        require([
-            "esri/layers/FeatureLayer",
-            "esri/tasks/QueryTask",
-            "esri/tasks/support/Query"
-        ], function(FeatureLayer, QueryTask, Query) {
-
-            // The URL to your Feature Service Layer (Layer 0)
+        require(["esri/tasks/QueryTask", "esri/tasks/support/Query"], function(QueryTask, Query) {
+            // --- MODIFIED: Changed http to https ---
             const featureServiceUrl = "https://jecop.usace.army.mil/publish/rest/services/MVK/MVK_VECTOR_OWNER_testing_webappsdatasharing/FeatureServer/0";
-
+            
             function loadContent() {
-                const queryTask = new QueryTask({
-                    url: featureServiceUrl
-                });
-                const query = new Query({
-                    where: `ContentID = '${contentIdToLoad}'`, // SQL-like query to find the right row
-                    outFields: ["HtmlContent"], // We only need this field
-                    returnGeometry: false
-                });
-
+                const queryTask = new QueryTask({ url: featureServiceUrl });
+                const query = new Query({ where: `ContentID = '${contentIdToLoad}'`, outFields: ["HtmlContent"], returnGeometry: false });
                 queryTask.execute(query).then(function(result) {
                     if (result.features.length > 0) {
-                        const content = result.features[0].attributes.HtmlContent;
-                        takeawaysContentDiv.innerHTML = content || '';
+                        takeawaysContentDiv.innerHTML = result.features[0].attributes.HtmlContent || '';
                     } else {
-                        console.error(`ContentID '${contentIdToLoad}' not found in the feature service.`);
-                        takeawaysContentDiv.innerHTML = `<p>Error: Content not found.</p>`;
+                        takeawaysContentDiv.innerHTML = `<p>Error: Content ID '${contentIdToLoad}' not found.</p>`;
                     }
                 }).catch(function(error){
                     console.error("Query failed: ", error);
-                    takeawaysContentDiv.innerHTML = `<p>Error loading content.</p>`;
+                    takeawaysContentDiv.innerHTML = `<p>Error loading content. Check network connection and service URL.</p>`;
                 });
             }
-
-            // Load the content initially
             loadContent();
         });
     });
 </script>
-
 </body>
 </html>
